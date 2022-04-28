@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Services\CategoryService;
 use App\Transformers\CategoryTransformer;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -11,16 +12,21 @@ use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
+    private CategoryService $categoryService;
+
+    public function __construct(CategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
+    }
+
     /**
      * Display a listing of the resource.
      *
-     * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder|\Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder|\Illuminate\Http\JsonResponse
      */
     public function index()
-    {
-        $category = Category::all()->toTree();
-
-        return $this->httpOK($category, CategoryTransformer::class);
+    {dd(1);
+        return $this->categoryService->index();
     }
 
     /**
@@ -115,7 +121,6 @@ class CategoryController extends Controller
             DB::rollBack();
             throw $exception;
         }
-
 
         return $this->httpNoContent();
     }

@@ -11,11 +11,4 @@ use Illuminate\Routing\Controller as BaseController;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests, HasTransformer;
-
-    protected $perPage;
-
-    public function __construct()
-    {
-        $this->perPage = (int) request('perPage',10);
-    }
 }
