@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RandomNumberRegexController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,7 +29,7 @@ Route::prefix('auth/{guard}')->group(function () {
 Route::middleware(['auth:admin'])->group(function () {
     Route::apiResource('category', CategoryController::class)->except(['update']);
     Route::put('category/nested', [CategoryController::class, 'nestedCategory']);
-
+    Route::apiResource('users',UserController::class);
 });
 
 Route::get('generate-number', [RandomNumberRegexController::class, 'test']);
