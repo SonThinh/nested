@@ -165,4 +165,14 @@ abstract class EloquentRepository implements BaseRepository
                            ->allowedSorts($this->allowedSorts)
                            ->defaultSort($this->defaultSort);
     }
+
+    /**
+     * @param $column
+     * @param array $ids
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function whereIn($column, array $ids): Builder
+    {
+        return $this->model->query()->whereIn($column, $ids);
+    }
 }

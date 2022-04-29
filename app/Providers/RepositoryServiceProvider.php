@@ -18,7 +18,7 @@ class RepositoryServiceProvider extends ServiceProvider
      * @return void
      */
     public function register()
-    {dd(1);
+    {
         $this->app->singleton(CategoryRepository::class, function () {
             return new EloquentCategoryRepository(new Category());
         });

@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Contracts\CategoryRepository;
-use App\Models\Admin;
+use App\Models\Category;
 use App\Transformers\CategoryTransformer;
-use Illuminate\Auth\AuthenticationException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class CategoryService extends BaseService
@@ -13,7 +13,7 @@ class CategoryService extends BaseService
     private CategoryRepository $categoryRepository;
 
     public function __construct(CategoryRepository $categoryRepository)
-    {dd(3);
+    {
         parent::__construct();
         $this->categoryRepository = $categoryRepository;
     }
@@ -24,7 +24,7 @@ class CategoryService extends BaseService
      * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder|\Illuminate\Http\JsonResponse
      */
     public function index()
-    {dd(1);
+    {
         $category = $this->categoryRepository->all()->toTree();
 
         return $this->httpOK($category, CategoryTransformer::class);
@@ -38,68 +38,82 @@ class CategoryService extends BaseService
      */
     public function store($data)
     {
-        return DB::transaction(function () use ($data) {
-            $admin = $this->adminRepository->store($data);
-            $admin->assignRole($data['role']);
+        $data = Arr::get($data, 'categories');
 
-            return $this->httpOK($admin, AdminTransformer::class);
+        return DB::transaction(function () use ($data) {
+            $insertedData = [];
+
+            foreach ($data as $item) {
+                $category = $this->categoryRepository->store($item);
+                array_push($insertedData, $category);
+            }
+
+            $this->categoryRepository->fixTree();
+
+            return $this->httpOK($insertedData, CategoryTransformer::class);
         });
     }
 
     /**
      * Display the specified resource.
      *
-     * @param \App\Models\Admin $admin
+     * @param \App\Models\Category $category
      * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder
      */
-    public function show(Admin $admin)
+    public function show(Category $category)
     {
-        $admin = $this->adminRepository->findOne($admin);
+        $category = $this->categoryRepository->findOne($category);
 
-        return $this->httpOK($admin, AdminTransformer::class);
+        return $this->httpOK($category, CategoryTransformer::class);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param \App\Models\Admin $admin
      * @param $data
      * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder|\Illuminate\Http\JsonResponse
      */
-    public function update(Admin $admin, $data)
+    public function update($data)
     {
-        return DB::transaction(function () use ($admin, $data) {
-            $this->adminRepository->update($admin, $data);
-            if ($data['role']) {
-                $admin->syncRoles($data['role']);
-                $this->adminRepository->update($admin, ['updated_at' => now()]);
+        $data = Arr::get($data, 'categories');
+
+        return DB::transaction(function () use ($data) {
+            $updatedData = [];
+
+            foreach ($data as $item) {
+                $category = $this->categoryRepository->update($this->categoryRepository->findById($item['id']), $item);
+                array_push($updatedData, $category);
             }
 
-            return $this->httpOK($admin, AdminTransformer::class);
+            $this->categoryRepository->fixTree();
+
+            return $this->httpOK($updatedData, CategoryTransformer::class);
         });
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\Models\Admin $admin
+     * @param \App\Models\Category $category
      * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder|\Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Auth\AuthenticationException
+     * @throws \Exception
      */
-    public function destroy(Admin $admin)
+    public function destroy(Category $category)
     {
-        // Check if delete current logged in
-        $currentAdmin = auth()->user();
-        if ($currentAdmin->id == $admin->id) {
-            throw new AuthenticationException();
+        $parentId = null;
+        if (! $category->isRoot()) {
+            $parentId = $category->getParentId();
         }
 
-        // Check if delete login_id = 'admin' (default account)
-        if ($admin->name == 'admin') {
-            throw new AuthenticationException();
-        }
-        $admin->delete();
+        return DB::transaction(function () use ($parentId, $category) {
+            if ($category->children->count() > 0) {
+                $ids = $category->children->pluck('id')->toArray();
+                $this->categoryRepository->whereIn('id', $ids)->update(['parent_id' => $parentId]);
+            }
+            $category->delete();
+            $this->categoryRepository->fixTree();
 
-        return $this->httpNoContent();
+            return $this->httpNoContent();
+        });
     }
 }

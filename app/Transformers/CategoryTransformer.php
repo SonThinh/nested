@@ -27,7 +27,7 @@ class CategoryTransformer extends Transformer
      * @param \App\Models\Category $category
      * @return array
      */
-    public function transform(Category $category)
+    public function transform(Category $category): array
     {
         return $category->toArray();
     }

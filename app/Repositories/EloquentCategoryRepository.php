@@ -11,4 +11,9 @@ class EloquentCategoryRepository extends EloquentRepository implements CategoryR
     {
         parent::__construct($model);
     }
+
+    public function fixTree()
+    {
+        return Category::fixTree();
+    }
 }

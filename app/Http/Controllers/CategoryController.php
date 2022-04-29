@@ -4,11 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Services\CategoryService;
-use App\Transformers\CategoryTransformer;
+use Flugg\Responder\Http\Responses\SuccessResponseBuilder;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
@@ -25,7 +22,7 @@ class CategoryController extends Controller
      * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder|\Illuminate\Http\JsonResponse
      */
     public function index()
-    {dd(1);
+    {
         return $this->categoryService->index();
     }
 
@@ -33,63 +30,33 @@ class CategoryController extends Controller
      * Store a newly created resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder|\Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
-        $data = Arr::get($request->all(), 'categories');
-
-        return DB::transaction(function () use ($data) {
-            $insertedData = [];
-
-            foreach ($data as $item) {
-                $category = new Category();
-                $category->fill($item);
-                $category->save();
-                array_push($insertedData, $category);
-            }
-
-            Category::fixTree();
-
-            return $this->httpOK($insertedData, CategoryTransformer::class);
-        });
+        return $this->categoryService->store($request->all());
     }
 
     /**
      * Display the specified resource.
      *
      * @param \App\Models\Category $category
-     * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder|\Illuminate\Http\JsonResponse
+     * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder
      */
-    public function show(Category $category)
+    public function show(Category $category): SuccessResponseBuilder
     {
-        return $this->httpOK($category, CategoryTransformer::class);
+        return $this->categoryService->show($category);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @return Response
+     * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder|\Illuminate\Http\JsonResponse
      */
     public function nestedCategory(Request $request)
     {
-        $data = Arr::get($request->all(), 'categories');
-
-        return DB::transaction(function () use ($data) {
-            $updatedData = [];
-
-            foreach ($data as $item) {
-                $category = Category::find($item['id']);
-                $category->fill($item);
-                $category->save();
-                array_push($updatedData, $category);
-            }
-
-            Category::fixTree();
-
-            return $this->httpOK($updatedData, CategoryTransformer::class);
-        });
+        return $this->categoryService->update($request->all());
     }
 
     /**
@@ -97,31 +64,10 @@ class CategoryController extends Controller
      *
      * @param \App\Models\Category $category
      * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder|\Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Auth\AuthenticationException|\Exception
      */
     public function destroy(Category $category)
     {
-
-        $parentId = null;
-        if (! $category->isRoot()) {
-            $parentId = $category->getParentId();
-        }
-
-        DB::beginTransaction();
-
-        try {
-            if ($category->children->count() > 0) {
-                $ids = $category->children->pluck('id')->toArray();
-                Category::whereIn('id', $ids)->update(['parent_id' => $parentId]);
-            }
-            $category->delete();
-            Category::fixTree();
-
-            DB::commit();
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            throw $exception;
-        }
-
-        return $this->httpNoContent();
+        return $this->categoryService->destroy($category);
     }
 }

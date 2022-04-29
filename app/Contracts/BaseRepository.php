@@ -83,4 +83,9 @@ interface BaseRepository
      * @return mixed
      */
     public function query();
+
+    /**
+     * @return mixed
+     */
+    public function whereIn($column, array $ids);
 }
