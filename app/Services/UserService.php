@@ -1,20 +1,19 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Services;
 
-use App\Http\Requests\CreateAdminRequest;
-use App\Http\Requests\CreateUserRequest;
+use App\Contracts\UserRepository;
 use App\Models\User;
-use App\Services\UserService;
-use Illuminate\Http\Request;
+use App\Transformers\UserTransformer;
 
-class UserController extends Controller
+class UserService extends BaseService
 {
-    private UserService $userService;
+    private UserRepository $userRepository;
 
-    public function __construct(UserService $userService)
+    public function __construct(UserRepository $userRepository)
     {
-        $this->userService = $userService;
+        parent::__construct();
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -24,18 +23,24 @@ class UserController extends Controller
      */
     public function index()
     {
-        return $this->userService->index();
+        $user = $this->userRepository->index();
+
+        return $this->httpOK($user->paginate($this->perPage), UserTransformer::class);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param \App\Http\Requests\CreateUserRequest $request
+     * @param $data
      * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder|\Illuminate\Http\JsonResponse
      */
-    public function store(CreateUserRequest $request)
+    public function store($data)
     {
-        return $this->userService->store($request->validated());
+        $user = $this->userRepository->store(array_merge($data, [
+            'unique_code' => generateUniqueCode(),
+        ]));
+
+        return $this->httpOK($user, UserTransformer::class);
     }
 
     /**
@@ -46,19 +51,23 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        return $this->userService->show($user);
+        $user = $this->userRepository->findOne($user);
+
+        return $this->httpOK($user, UserTransformer::class);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
      * @param \App\Models\User $user
+     * @param $data
      * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder|\Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, User $user)
+    public function update(User $user, $data)
     {
-        return $this->userService->update($user, $request->all());
+        $user = $this->userRepository->update($user, $data);
+
+        return $this->httpOK($user, UserTransformer::class);
     }
 
     /**
@@ -69,6 +78,8 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        return $this->userService->destroy($user);
+        $user->delete();
+
+        return $this->httpNoContent();
     }
 }

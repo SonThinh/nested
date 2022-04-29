@@ -27,8 +27,8 @@ Route::prefix('auth/{guard}')->group(function () {
 });
 
 Route::middleware(['auth:admin'])->group(function () {
-    Route::apiResource('category', CategoryController::class)->except(['update']);
-    Route::put('category/nested', [CategoryController::class, 'nestedCategory']);
+    Route::apiResource('categories', CategoryController::class)->except(['update']);
+    Route::put('categories/nested', [CategoryController::class, 'nestedCategory']);
     Route::apiResource('users',UserController::class);
 });
 
