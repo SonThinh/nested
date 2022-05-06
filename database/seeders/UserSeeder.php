@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        User::factory(10)->create();
+        User::factory(400)->create();
         User::query()->create([
             'login_id'      => 'user',
             'password'      => 'password',

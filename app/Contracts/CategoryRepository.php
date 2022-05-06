@@ -2,7 +2,7 @@
 
 namespace App\Contracts;
 
-interface CategoryRepository extends BaseRepository
+interface CategoryRepository
 {
 
 }

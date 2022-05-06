@@ -7,7 +7,6 @@
     "require": {
         "php": "^7.4|^8.0",
         "bensampo/laravel-enum": "^3.3",
-        "daaner/tiktok": "^0.2.0",
         "flugger/laravel-responder": "^3.1",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
@@ -20,7 +19,8 @@
         "nekman/luhn-algorithm": "^5.0",
         "pointybeard/reverse-regex": "^1.0",
         "spatie/laravel-query-builder": "^4.0",
-        "tymon/jwt-auth": "^1.0"
+        "tymon/jwt-auth": "^1.0",
+        "elasticsearch/elasticsearch": "^7.0"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

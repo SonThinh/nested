@@ -6,7 +6,6 @@ use App\Contracts\BaseRepository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Spatie\QueryBuilder\QueryBuilder;
 
 abstract class EloquentRepository implements BaseRepository
 {
@@ -149,21 +148,6 @@ abstract class EloquentRepository implements BaseRepository
     protected function addExtraFilters($filters)
     {
         $this->allowedFilters = array_merge($this->allowedFilters, $filters);
-    }
-
-    /**
-     * @param array $conditions
-     * @return \Spatie\QueryBuilder\Concerns\SortsQuery|\Spatie\QueryBuilder\QueryBuilder
-     */
-    public function index(array $conditions = [])
-    {
-        return QueryBuilder::for($this->model->query()->where($conditions))
-                           ->select($this->defaultSelect)
-                           ->allowedFilters($this->allowedFilters)
-                           ->allowedFields($this->allowedFields)
-                           ->allowedIncludes($this->allowedIncludes)
-                           ->allowedSorts($this->allowedSorts)
-                           ->defaultSort($this->defaultSort);
     }
 
     /**

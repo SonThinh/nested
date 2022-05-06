@@ -14,7 +14,7 @@ class CreateCategoriesTable extends Migration
     public function up()
     {
         Schema::create('categories', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->string('name');
             $table->unsignedInteger('_lft')->default(0);
             $table->unsignedInteger('_rgt')->default(0);
@@ -23,7 +23,7 @@ class CreateCategoriesTable extends Migration
         });
 
         Schema::table('categories',function (Blueprint $table){
-            $table->foreignUuid('parent_id')->nullable()->references('id')->on('categories');
+            $table->foreignId('parent_id')->nullable()->references('id')->on('categories');
         });
     }
 

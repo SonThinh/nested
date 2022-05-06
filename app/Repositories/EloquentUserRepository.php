@@ -4,8 +4,7 @@ namespace App\Repositories;
 
 use App\Contracts\UserRepository;
 use App\Models\User;
-use Spatie\QueryBuilder\AllowedFilter;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class EloquentUserRepository extends EloquentRepository implements UserRepository
 {
@@ -15,38 +14,26 @@ class EloquentUserRepository extends EloquentRepository implements UserRepositor
 
         $this->defaultSelect = [
             'id',
-            'first_apply_at',
-            'last_apply_at',
-            'age',
-            'gender',
-            'impression_on_wonda',
-            'created_at',
+            'name',
+            'furigana_name',
+            'login_id',
+            'email',
+            'unique_code',
         ];
-
-        $this->allowedIncludes = [
-            'applies',
-            'serials',
-        ];
-
-        $this->addExtraFilters([
-            AllowedFilter::scope('created_at'),
-        ]);
     }
 
-    public function register()
+    /**
+     * @param array $conditions
+     * @return \Spatie\QueryBuilder\Concerns\SortsQuery|\Spatie\QueryBuilder\QueryBuilder
+     */
+    public function index(array $conditions = [])
     {
-        $user = User::query()->create([
-            'expired_at' => now(),
-        ]);
-
-        $expiredTime = now()->addMonths(3);
-        $token = JWTAuth::customClaims(['exp' => $expiredTime->timestamp])->fromUser($user);
-
-        $user->update([
-            'token'      => $token,
-            'expired_at' => $expiredTime,
-        ]);
-
-        return $user;
+        return QueryBuilder::for($this->model->query()->where($conditions))
+                           ->select($this->defaultSelect)
+                           ->allowedFilters($this->allowedFilters)
+                           ->allowedFields($this->allowedFields)
+                           ->allowedIncludes($this->allowedIncludes)
+                           ->allowedSorts($this->allowedSorts)
+                           ->defaultSort($this->defaultSort);
     }
 }
