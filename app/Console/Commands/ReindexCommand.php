@@ -2,11 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Enums\ProposalApproveStatusEnum;
 use App\Models\Category;
-use App\Models\Proposal;
 use App\Models\User;
-use App\Services\P3Service;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Illuminate\Console\Command;
@@ -40,24 +37,23 @@ class ReindexCommand extends Command
     public function handle()
     {
         $this->info('Remove all indexes....');
+        $this->removeAllIndex();
 
-        $this->removeRecipeFromIndex(new User());
-        $this->analyzer(new User());
         $this->info('Indexing all user. This might take a while...');
-        $this->processData(User::cursor());
+        $this->processData(new User(), User::cursor());
 
         $this->info("\n");
 
         $this->info('Indexing all category. This might take a while...');
-        $this->removeRecipeFromIndex(new Category());
-        $this->analyzer(new Category());
-        $this->processData(Category::cursor());
+        $this->processData(new Category(), Category::cursor());
 
         $this->info("\nDone!");
     }
 
-    public function processData($data)
+    public function processData($model, $data)
     {
+        $this->removeRecipeFromIndex($model);
+        $this->analyzer($model);
         $bar = $this->output->createProgressBar(count($data));
 
         $bar->start();
@@ -92,6 +88,16 @@ class ReindexCommand extends Command
         }
     }
 
+    public function removeAllIndex()
+    {
+        $client = new \GuzzleHttp\Client();
+        $uri = 'http://localhost:9200/_all';
+        try {
+            $client->request('DELETE', $uri);
+        } catch (Missing404Exception $e) {
+        }
+    }
+
     public function analyzer($model)
     {
         $params = [
@@ -105,24 +111,24 @@ class ReindexCommand extends Command
         $this->elasticsearch->indices()->create($params);
     }
 
-    public function putPipeline()
-    {
-        $params = [
-            'id'   => 'attachment',
-            'body' => [
-                'description' => 'Extract attachment information',
-                'processors'  => [
-                    [
-                        'attachment' => [
-                            'field' => 'proposal_data',
-                        ],
-                        'remove'     => [
-                            'field' => 'proposal_data',
-                        ],
-                    ],
-                ],
-            ],
-        ];
-        $this->elasticsearch->ingest()->putPipeline($params);
-    }
+    //public function putPipeline()
+    //{
+    //    $params = [
+    //        'id'   => 'attachment',
+    //        'body' => [
+    //            'description' => 'Extract attachment information',
+    //            'processors'  => [
+    //                [
+    //                    'attachment' => [
+    //                        'field' => 'proposal_data',
+    //                    ],
+    //                    'remove'     => [
+    //                        'field' => 'proposal_data',
+    //                    ],
+    //                ],
+    //            ],
+    //        ],
+    //    ];
+    //    $this->elasticsearch->ingest()->putPipeline($params);
+    //}
 }

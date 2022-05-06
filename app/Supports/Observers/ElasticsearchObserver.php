@@ -2,7 +2,7 @@
 
 namespace App\Supports\Observers;
 
-//use App\Jobs\UpdateProposalOnElasticSearchJob;
+use App\Jobs\UpdateOnElasticsearchJob;
 use Elasticsearch\Client;
 
 class ElasticsearchObserver {
@@ -14,7 +14,7 @@ class ElasticsearchObserver {
 
     public function saved($model) {
         // may we need to put it to queue
-        //UpdateProposalOnElasticSearchJob::dispatch($model->id)->onQueue('high');
+        UpdateOnElasticsearchJob::dispatch($model)->onQueue('high');
     }
 
     public function deleted($model) {
