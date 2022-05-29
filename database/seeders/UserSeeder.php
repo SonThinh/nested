@@ -14,7 +14,6 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        User::factory(400)->create();
         User::query()->create([
             'login_id'      => 'user',
             'password'      => 'password',
@@ -23,5 +22,6 @@ class UserSeeder extends Seeder
             'furigana_name' => 'user',
             'unique_code'   => generateUniqueCode(),
         ]);
+        User::factory(400)->create();
     }
 }

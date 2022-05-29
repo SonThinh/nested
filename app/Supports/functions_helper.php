@@ -63,3 +63,22 @@ if (! function_exists('generateUniqueCode')) {
         return $uniqueCode;
     }
 }
+if (! function_exists('convertUploadedFileToHumanReadable')) {
+    /**
+     * @param int $size
+     * @param int $precision
+     * @return float|int
+     */
+    function convertUploadedFileToHumanReadable(int $size, int $precision = 3)
+    {
+        if ($size > 0) {
+            $base = log($size) / log(1024);
+
+            //$suffixes = [' bytes', ' KB', ' MB', ' GB', ' TB'];
+            //return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
+            return round(pow(1024, $base - floor($base)), $precision);
+        }
+
+        return $size;
+    }
+}

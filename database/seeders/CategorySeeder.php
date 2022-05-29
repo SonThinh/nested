@@ -14,7 +14,7 @@ class CategorySeeder extends Seeder
      */
     public function run()
     {
-        foreach (range(1, 200) as $item) {
+        foreach (range(1, 5) as $item) {
             Category::query()->create([
                 'parent_id' => $this->randParentId(),
                 'name'      => 'category '.$item,
@@ -28,7 +28,7 @@ class CategorySeeder extends Seeder
     {
         $id = optional(Category::query()->inRandomOrder()->first())->id;
 
-        if ($id == rand(1, 50)) {
+        if ($id == rand(1, 5)) {
             $id = null;
         }
 

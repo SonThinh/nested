@@ -3,12 +3,15 @@
 namespace App\Providers;
 
 use App\Contracts\CategoryRepository;
+use App\Contracts\FileRepository;
 use App\Contracts\ProductRepository;
 use App\Contracts\UserRepository;
 use App\Models\Category;
+use App\Models\File;
 use App\Models\Product;
 use App\Models\User;
 use App\Repositories\EloquentCategoryRepository;
+use App\Repositories\EloquentFileRepository;
 use App\Repositories\EloquentProductRepository;
 use App\Repositories\EloquentUserRepository;
 use App\Supports\Elasticsearch\CategoryElasticsearch;
@@ -44,6 +47,10 @@ class RepositoryServiceProvider extends ServiceProvider
 
         $this->app->singleton(ProductRepository::class, function () {
             return new EloquentProductRepository(new Product());
+        });
+
+        $this->app->singleton(FileRepository::class, function () {
+            return new EloquentFileRepository(new File());
         });
     }
 
