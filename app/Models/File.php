@@ -18,11 +18,10 @@ class File extends Model
         'name',
         'mime_type',
         'is_published',
-        'type',
         'size',
         'disk',
-        'name_file',
         'path',
+        'type',
         'additional',
     ];
 
@@ -35,14 +34,14 @@ class File extends Model
 
     public function getUrlAttribute(): string
     {
-        dd(1);
         $disk = $this->attributes['disk'];
         $path = $this->attributes['path'];
+
         switch ($disk) {
             case 's3':
                 return (string) Storage::disk('s3')->url($path);
             case 'public':
-                return route_ui('file.show', ['path' => $path.'?'.now()->timestamp]);
+                return route('file.show', ['path' => $path.'?'.now()->timestamp]);
             default:
                 return '';
         }
@@ -54,5 +53,10 @@ class File extends Model
     public function products(): MorphToMany
     {
         return $this->morphToMany(Product::class, 'model', 'model_has_files');
+    }
+
+    public function categories(): MorphToMany
+    {
+        return $this->morphToMany(Category::class, 'model', 'model_has_files');
     }
 }

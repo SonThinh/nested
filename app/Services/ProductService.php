@@ -6,6 +6,7 @@ use App\Contracts\ProductRepository;
 use App\Models\User;
 use App\Transformers\ProductTransformer;
 use App\Transformers\UserTransformer;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class ProductService extends BaseService
@@ -39,8 +40,10 @@ class ProductService extends BaseService
     public function store($data)
     {
         return DB::transaction(function () use ($data) {
+            $fileId = Arr::get($data, 'fileId');
+
             $product = $this->productRepository->store($data);
-            $product->files()->sync();
+            $product->files()->sync($fileId);
 
             return $this->httpOK($product, ProductTransformer::class);
         });

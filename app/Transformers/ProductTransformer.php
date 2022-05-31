@@ -12,7 +12,10 @@ class ProductTransformer extends Transformer
      *
      * @var string[]
      */
-    protected $relations = [];
+    protected $relations = [
+        'files'    => FileTransformer::class,
+        'category' => CategoryTransformer::class,
+    ];
 
     /**
      * List of autoloaded default relations.

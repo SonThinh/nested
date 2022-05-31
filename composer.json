@@ -7,9 +7,11 @@
     "require": {
         "php": "^7.4|^8.0",
         "bensampo/laravel-enum": "^3.3",
+        "elasticsearch/elasticsearch": "^7.0",
         "flugger/laravel-responder": "^3.1",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
+        "intervention/image": "^2.7",
         "ircmaxell/random-lib": "^1.2",
         "irfa/php-sn-generator": "^1.1",
         "kalnoy/nestedset": "^6.0",
@@ -19,8 +21,7 @@
         "nekman/luhn-algorithm": "^5.0",
         "pointybeard/reverse-regex": "^1.0",
         "spatie/laravel-query-builder": "^4.0",
-        "tymon/jwt-auth": "^1.0",
-        "elasticsearch/elasticsearch": "^7.0"
+        "tymon/jwt-auth": "^1.0"
     },
     "require-dev": {
         "deployer/deployer": "^6.8",

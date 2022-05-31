@@ -32,8 +32,8 @@ class CreateProductRequest extends BaseRequest
                 'gte:'.$this->min_order,
                 'max:'.$this->stock_quantity,
             ],
-            'header_image'                   => 'required|image|mimes:jpg,jpeg,jpe,png,gif|max:5120',
-            'detail_image'                   => 'required|image|mimes:jpg,jpeg,jpe,png,gif|max:5120',
+            'fileIds'                        => 'required|array|max:20',
+            'fileIds.*'                      => ['required', 'exists:files,id'],
         ];
     }
 }

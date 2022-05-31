@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Supports\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -24,6 +25,7 @@ class Product extends Model
         'stock_quantity',
         'max_order',
         'min_order',
+        'category_id',
     ];
 
     /**
@@ -32,5 +34,10 @@ class Product extends Model
     public function files(): MorphToMany
     {
         return $this->morphToMany(File::class, 'model', 'model_has_files');
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'category_id', 'id');
     }
 }

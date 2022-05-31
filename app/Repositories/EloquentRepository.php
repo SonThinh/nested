@@ -145,7 +145,7 @@ abstract class EloquentRepository implements BaseRepository
      * @param $filters
      * @return void
      */
-    protected function addExtraFilters($filters)
+    public function addExtraFilters($filters)
     {
         $this->allowedFilters = array_merge($this->allowedFilters, $filters);
     }

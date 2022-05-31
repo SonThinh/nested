@@ -1,10 +1,10 @@
 <?php
 
+use App\Http\Controllers\AttachFilesModelController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\RandomNumberRegexController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,16 +31,17 @@ Route::prefix('auth/{guard}')->group(function () {
 Route::middleware(['auth:admin'])->group(function () {
     Route::apiResource('categories', CategoryController::class)->except(['update']);
     Route::put('categories/nested', [CategoryController::class, 'nestedCategory']);
-    Route::apiResource('users',UserController::class);
+    Route::apiResource('users', UserController::class);
 
     //file
     Route::match(['PUT', 'PATCH', 'POST'], 'files/upload', [FileController::class, 'upload']);
     Route::get('files', [FileController::class, 'index']);
+    Route::get('files/{file}/download', [FileController::class, 'download']);
     Route::delete('files/{file}', [FileController::class, 'destroy']);
-
-    Route::match(['POST', 'PUT', 'PATCH'], 'attach-file/{modelId}/{modelType}',
-        [AttachFilesModelController::class, 'store']);
-
-    Route::apiResource('products',ProductController::class);
+    Route::match(['POST', 'PUT', 'PATCH'], 'attach-file/{modelId}/{modelType}', [
+        AttachFilesModelController::class,
+        'store',
+    ]);
+    Route::apiResource('products', ProductController::class);
 });
 

@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Supports\Traits\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Kalnoy\Nestedset\NodeTrait;
 
@@ -25,6 +27,16 @@ class Category extends Model
             'parent_id',
             'name',
         ];
+    }
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class, 'category_id', 'id');
+    }
+
+    public function files(): MorphToMany
+    {
+        return $this->morphToMany(File::class, 'model', 'model_has_files');
     }
 
     public function getSearchIndex(): string

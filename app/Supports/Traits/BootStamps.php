@@ -7,9 +7,10 @@ use Illuminate\Support\Facades\Schema;
 
 trait BootStamps
 {
-    public static function bootStamps()
+    public static function boot()
     {
-        $user = Auth::guard('admins')->user();
+        parent::boot();
+        $user = Auth::guard('admin')->user();
         if ($user) {
             static::creating(function ($model) use ($user) {
                 if ($user && self::checkUserStampColumn($model->getTable(), 'created_by')) {

@@ -26,6 +26,7 @@ class CreateProductsTable extends Migration
             $table->integer('stock_quantity')->unsigned();
             $table->integer('max_order')->default(0)->unsigned();
             $table->integer('min_order')->default(0)->unsigned();
+            $table->foreignId('category_id')->references('id')->on('categories')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
         });
