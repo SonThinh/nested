@@ -58,7 +58,7 @@ class CategoryService extends BaseService
      * Display the specified resource.
      *
      * @param \App\Models\Category $category
-     * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder
+     * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder|\Illuminate\Http\JsonResponse
      */
     public function show(Category $category)
     {

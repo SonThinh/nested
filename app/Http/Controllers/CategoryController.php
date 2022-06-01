@@ -43,7 +43,7 @@ class CategoryController extends Controller
      * @param \App\Models\Category $category
      * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder
      */
-    public function show(Category $category): SuccessResponseBuilder
+    public function show(Category $category)
     {
         return $this->categoryService->show($category);
     }

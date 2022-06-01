@@ -16,12 +16,12 @@ class AttachFilesModelController extends Controller
     }
 
     public function store(AttachFileToModelRequest $request, string $modelId, string $modelType)
-    {dd($request->validated(),$modelId,$modelType);
+    {
         $modelTypeCheck = ModelTypeEnum::asArray();
         if (! in_array($modelType, $modelTypeCheck)) {
-            return $this->httpNotFound([], null, 'Model Not Found');
+            return $this->httpNotFound([], 404, 'Model Not Found');
         }
-        $this->fileService->attachFilesModel($modelId, $modelType, $request->validated());
+        return $this->fileService->attachFilesModel($modelId, $modelType, $request->validated());
     }
 }
 

@@ -14,6 +14,7 @@ class CategoryTransformer extends Transformer
      */
     protected $relations = [
         'products' => ProductTransformer::class,
+        'files'    => FileTransformer::class,
     ];
 
     /**

@@ -2,22 +2,32 @@
 
 namespace App\Services;
 
+use App\Contracts\CategoryRepository;
 use App\Contracts\FileRepository;
+use App\Enums\ModelTypeEnum;
 use App\Supports\Actions\UploadFileAction;
+use App\Transformers\CategoryTransformer;
 use App\Transformers\FileTransformer;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FileService extends BaseService
 {
     private FileRepository $fileRepository;
 
+    private CategoryRepository $categoryRepository;
+
     private UploadFileAction $action;
 
-    public function __construct(FileRepository $fileRepository, UploadFileAction $action)
-    {
+    public function __construct(
+        FileRepository $fileRepository,
+        CategoryRepository $categoryRepository,
+        UploadFileAction $action
+    ) {
         parent::__construct();
         $this->fileRepository = $fileRepository;
+        $this->categoryRepository = $categoryRepository;
         $this->action = $action;
     }
 
@@ -75,16 +85,20 @@ class FileService extends BaseService
         return $this->httpNoContent();
     }
 
-    public function attachFilesModel(string $modelId, string $modelType, array $data){
-        switch ($modelType) {
-            case 'posttranslation':
-                $locale = Arr::get($data, 'locale');
-                $fileIds = Arr::get($data, 'file_ids');
+    public function attachFilesModel(string $modelId, string $modelType, array $data)
+    {
+        return DB::transaction(function () use ($modelId, $modelType, $data) {
+            switch ($modelType) {
+                case ModelTypeEnum::CATEGORY:
+                    $fileIds = Arr::get($data, 'file_ids');
+                    $category = $this->categoryRepository->findById($modelId);
+                    $files = $this->fileRepository->whereIn('id', $fileIds)->get();
+                    $category->files()->attach($files);
 
-                $translation = PostTranslation::query()->where('locale', $locale)->findOrFail($modelId);
-                $files = File::query()->whereIn('id', $fileIds)->get();
-                $translation->files()->attach($files);
-                break;
-        }
+                    return $this->httpOK($category, CategoryTransformer::class);
+                default:
+                    return $this->httpNotFound();
+            }
+        });
     }
 }

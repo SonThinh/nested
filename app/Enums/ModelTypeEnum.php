@@ -6,7 +6,7 @@ use BenSampo\Enum\Enum;
 
 final class ModelTypeEnum extends Enum
 {
-    const PRODUCT = 'Product';
+    const PRODUCT = 'products';
 
-    const CATEGORY = 'Category';
+    const CATEGORY = 'categories';
 }
